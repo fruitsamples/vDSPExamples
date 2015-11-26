@@ -107,11 +107,11 @@ static void ConvTiming( )
 		filter[i] = 1.0;
 	
 	// Correlation.
-	conv ( signal, signalStride, filter, filterStride, result, resultStride, resultLength, filterLength );
+	vDSP_conv ( signal, signalStride, filter, filterStride, result, resultStride, resultLength, filterLength );
 	
 	// Carry out a convolution.
 	filterStride = -1;
-	conv ( signal, signalStride, filter + filterLength - 1, filterStride, result, resultStride, resultLength, filterLength );
+	vDSP_conv ( signal, signalStride, filter + filterLength - 1, filterStride, result, resultStride, resultLength, filterLength );
 	
 	// Timing section for the convolution.
 	{
@@ -127,7 +127,7 @@ static void ConvTiming( )
 		
 		StartClock ( );
 		for ( i = 0; i < MAX_LOOP_NUM; i++ )
-			conv ( signal, signalStride, filter, filterStride, result, resultStride, resultLength, filterLength );
+			vDSP_conv ( signal, signalStride, filter, filterStride, result, resultStride, resultLength, filterLength );
 		StopClock ( &time );
 		
 #if defined(__VEC__)

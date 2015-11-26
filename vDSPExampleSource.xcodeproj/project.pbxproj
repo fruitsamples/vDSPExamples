@@ -109,9 +109,18 @@
 		08FB7793FE84155DC02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			buildConfigurationList = 87F84CE10BE681C600EA8295 /* Build configuration list for PBXProject "vDSPExampleSource" */;
+			compatibilityVersion = "Xcode 2.4";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+			);
 			mainGroup = 08FB7794FE84155DC02AAC07 /* vDSPExampleSource */;
 			projectDirPath = "";
+			projectRoot = "";
 			targets = (
 				8DD76FA90486AB0100D96B5E /* vDSPExampleSource */,
 			);
@@ -137,6 +146,7 @@
 		87F84CDE0BE681C600EA8295 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -148,6 +158,7 @@
 				INSTALL_PATH = "$(HOME)/bin";
 				PREBINDING = NO;
 				PRODUCT_NAME = vDSPExampleSource;
+				SDKROOT = "";
 				ZERO_LINK = NO;
 			};
 			name = Debug;
@@ -155,6 +166,8 @@
 		87F84CDF0BE681C600EA8295 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1)";
+				ARCHS_STANDARD_32_64_BIT_PRE_XCODE_3_1 = "x86_64 i386 ppc";
 				COPY_PHASE_STRIP = YES;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
@@ -164,6 +177,7 @@
 				INSTALL_PATH = "$(HOME)/bin";
 				PREBINDING = NO;
 				PRODUCT_NAME = vDSPExampleSource;
+				SDKROOT = "";
 				ZERO_LINK = NO;
 			};
 			name = Release;

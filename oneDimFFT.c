@@ -159,10 +159,10 @@ static void RealFFTUsageAndTiming( )
 	// Look at the real signal as an interleaved complex vector by casting it.
 	// Then call the transformation function ctoz to get a split complex vector,
 	// which for a real signal, divides into an even-odd configuration.
-	ctoz ( ( COMPLEX * ) originalReal, 2, &A, 1, nOver2 );
+	vDSP_ctoz ( ( COMPLEX * ) originalReal, 2, &A, 1, nOver2 );
 	
 	// Set up the required memory for the FFT routines and check its availability.
-	setupReal = create_fftsetup ( log2n, FFT_RADIX2);
+	setupReal = vDSP_create_fftsetup ( log2n, FFT_RADIX2);
 	if ( setupReal == NULL )
 	{      
 		printf ( "\nFFT_Setup failed to allocate enough memory for the real FFT.\n" );
@@ -170,18 +170,18 @@ static void RealFFTUsageAndTiming( )
 	}
 	
 	// Carry out a Forward and Inverse FFT transform.
-	fft_zrip ( setupReal, &A, stride, log2n, FFT_FORWARD );
-	fft_zrip ( setupReal, &A, stride, log2n, FFT_INVERSE );
+	vDSP_fft_zrip ( setupReal, &A, stride, log2n, FFT_FORWARD );
+	vDSP_fft_zrip ( setupReal, &A, stride, log2n, FFT_INVERSE );
 	
 	// Verify correctness of the results, but first scale it by 2n.
 	scale = (float)1.0/(2*n);
 	
-	vsmul( A.realp, 1, &scale, A.realp, 1, nOver2 );
-	vsmul( A.imagp, 1, &scale, A.imagp, 1, nOver2 );
+	vDSP_vsmul( A.realp, 1, &scale, A.realp, 1, nOver2 );
+	vDSP_vsmul( A.imagp, 1, &scale, A.imagp, 1, nOver2 );
 	
 	// The output signal is now in a split real form.  Use the function
 	// ztoc to get a split real vector.
-	ztoc ( &A, 1, ( COMPLEX * ) obtainedReal, 2, nOver2 );
+	vDSP_ztoc ( &A, 1, ( COMPLEX * ) obtainedReal, 2, nOver2 );
 	
 	// Check for accuracy by looking at the inverse transform results.
 	Compare( originalReal, obtainedReal, n );
@@ -200,9 +200,9 @@ static void RealFFTUsageAndTiming( )
 		StartClock ( );
 		for ( i = 0; i < MAX_LOOP_NUM; i++ )
 		{
-			ctoz ( ( COMPLEX * ) originalReal, 2, &A, 1, nOver2 );
-			fft_zrip ( setupReal, &A, stride, log2n, FFT_FORWARD );
-			ztoc ( &A, 1, ( COMPLEX * ) obtainedReal, 2, nOver2 );
+			vDSP_ctoz ( ( COMPLEX * ) originalReal, 2, &A, 1, nOver2 );
+			vDSP_fft_zrip ( setupReal, &A, stride, log2n, FFT_FORWARD );
+			vDSP_ztoc ( &A, 1, ( COMPLEX * ) obtainedReal, 2, nOver2 );
 		}
 		StopClock ( &time );
 		
@@ -243,7 +243,7 @@ static void RealFFTUsageAndTiming( )
 		
 		StartClock ( );
 		for ( i = 0; i < MAX_LOOP_NUM; i++ )
-			fft_zrip ( setupReal, &A, stride, log2n, FFT_FORWARD );
+			vDSP_fft_zrip ( setupReal, &A, stride, log2n, FFT_FORWARD );
 		StopClock ( &time );
 		
 #if defined(__VEC__)
@@ -265,7 +265,7 @@ static void RealFFTUsageAndTiming( )
 	}
 	
 	// Free the allocated memory.
-	destroy_fftsetup ( setupReal );
+	vDSP_destroy_fftsetup ( setupReal );
 	free ( obtainedReal );
 	free ( originalReal );
 	free ( A.realp );
@@ -327,10 +327,10 @@ static void RealFFTUsageAndTimingOutOfPlace ( )
 	// Look at the real signal as an interleaved complex vector by casting it.
 	// Then call the transformation function ctoz to get a split complex vector,
 	// which for a real signal, divides into an even-odd configuration.
-	ctoz ( ( COMPLEX * ) originalReal, 2, &A, 1, nOver2 );
+	vDSP_ctoz ( ( COMPLEX * ) originalReal, 2, &A, 1, nOver2 );
 	
 	// Set up the required memory for the FFT routines and check its availability.
-	setupReal = create_fftsetup ( log2n, FFT_RADIX2);
+	setupReal = vDSP_create_fftsetup ( log2n, FFT_RADIX2);
 	if ( setupReal == NULL )
 	{      
 		printf ( "\nFFT_Setup failed to allocate enough memory for the real FFT.\n" );
@@ -340,18 +340,18 @@ static void RealFFTUsageAndTimingOutOfPlace ( )
 	// Carry out a Forward and Inverse FFT transform. It's very important to remember that this is an out-of-place transform. 
 	// Therefore, result1 will contain the intermediate result which is the result of forward transform and the result from the
 	// inverse transform will be stored again in result1.
-	fft_zrop ( setupReal, &A, stride, &result1, result1Stride, log2n, FFT_FORWARD );
-	fft_zrop ( setupReal, &result1, result1Stride, &result2, result2Stride, log2n, FFT_INVERSE );
+	vDSP_fft_zrop ( setupReal, &A, stride, &result1, result1Stride, log2n, FFT_FORWARD );
+	vDSP_fft_zrop ( setupReal, &result1, result1Stride, &result2, result2Stride, log2n, FFT_INVERSE );
 	
 	// Verify correctness of the results, but first scale it by 2n.
 	scale = (float)1.0/(2*n);
 	
-	vsmul( result2.realp, 1, &scale, result2.realp, 1, nOver2 );
-	vsmul( result2.imagp, 1, &scale, result2.imagp, 1, nOver2 );
+	vDSP_vsmul( result2.realp, 1, &scale, result2.realp, 1, nOver2 );
+	vDSP_vsmul( result2.imagp, 1, &scale, result2.imagp, 1, nOver2 );
 	
 	// The output signal is now in a split real form.  Use the function
 	// ztoc to get a split real vector.
-	ztoc ( &result2, 1, ( COMPLEX * ) obtainedReal, 2, nOver2 );
+	vDSP_ztoc ( &result2, 1, ( COMPLEX * ) obtainedReal, 2, nOver2 );
 	
 	// Check for accuracy by looking at the inverse transform results.
 	Compare( originalReal, obtainedReal, n );
@@ -370,9 +370,9 @@ static void RealFFTUsageAndTimingOutOfPlace ( )
 		StartClock ( );
 		for ( i = 0; i < MAX_LOOP_NUM; i++ )
 		{
-			ctoz ( ( COMPLEX * ) originalReal, 2, &A, 1, nOver2 );
-			fft_zrop ( setupReal, &A, stride, &result1, result1Stride, log2n, FFT_FORWARD );
-			ztoc ( &result1, 1, ( COMPLEX * ) obtainedReal, 2, nOver2 );
+			vDSP_ctoz ( ( COMPLEX * ) originalReal, 2, &A, 1, nOver2 );
+			vDSP_fft_zrop ( setupReal, &A, stride, &result1, result1Stride, log2n, FFT_FORWARD );
+			vDSP_ztoc ( &result1, 1, ( COMPLEX * ) obtainedReal, 2, nOver2 );
 		}
 		StopClock ( &time );
 		
@@ -413,7 +413,7 @@ static void RealFFTUsageAndTimingOutOfPlace ( )
 		
 		StartClock ( );
 		for ( i = 0; i < MAX_LOOP_NUM; i++ )
-			fft_zrop ( setupReal, &A, stride, &result1, result1Stride, log2n, FFT_FORWARD );
+			vDSP_fft_zrop ( setupReal, &A, stride, &result1, result1Stride, log2n, FFT_FORWARD );
 		StopClock ( &time );
 		
 #if defined(__VEC__)
@@ -435,7 +435,7 @@ static void RealFFTUsageAndTimingOutOfPlace ( )
 	}
 	
 	// Free the allocated memory.
-	destroy_fftsetup ( setupReal );
+	vDSP_destroy_fftsetup ( setupReal );
 	free ( obtainedReal );
 	free ( originalReal );
 	free ( A.realp );
@@ -493,7 +493,7 @@ static void ComplexFFTUsageAndTiming ( )
 	memcpy ( A.imagp, originalValue.imagp, ( n * sizeof ( float ) ) ); 
 	
 	// Set up the required memory for the FFT routines and check its availability.
-	setup = create_fftsetup ( log2n, FFT_RADIX2 );
+	setup = vDSP_create_fftsetup ( log2n, FFT_RADIX2 );
 	if ( setup == NULL )
 	{      
 		printf ( "\nFFT_Setup failed to allocate enough memory.\n" );
@@ -501,14 +501,14 @@ static void ComplexFFTUsageAndTiming ( )
 	}
 	
 	// Carry out a Forward and Inverse FFT transform, check for errors.
-	fft_zip ( setup, &A, stride, log2n, FFT_FORWARD );
-	fft_zip ( setup, &A, stride, log2n, FFT_INVERSE );
+	vDSP_fft_zip ( setup, &A, stride, log2n, FFT_FORWARD );
+	vDSP_fft_zip ( setup, &A, stride, log2n, FFT_INVERSE );
 	
 	// Verify correctness of the results.
 	scale = ( float ) 1.0 / n;
 	
-	vsmul( A.realp, 1, &scale, A.realp, 1, n );
-	vsmul( A.imagp, 1, &scale, A.imagp, 1, n );
+	vDSP_vsmul( A.realp, 1, &scale, A.realp, 1, n );
+	vDSP_vsmul( A.imagp, 1, &scale, A.imagp, 1, n );
 	
 	Compare( originalValue.realp, A.realp, n );
 	Compare( originalValue.imagp, A.imagp, n );
@@ -526,7 +526,7 @@ static void ComplexFFTUsageAndTiming ( )
 		
 		StartClock ( );
 		for ( i = 0; i < MAX_LOOP_NUM; i++ )
-			fft_zip ( setup, &A, stride, log2n, FFT_FORWARD );
+			vDSP_fft_zip ( setup, &A, stride, log2n, FFT_FORWARD );
 		StopClock ( &time );
 		
 #if defined(__VEC__)
@@ -548,7 +548,7 @@ static void ComplexFFTUsageAndTiming ( )
 	}
 	
 	// Free allocated memory.
-	destroy_fftsetup ( setup );
+	vDSP_destroy_fftsetup ( setup );
 	free ( originalValue.realp );
 	free ( originalValue.imagp );
 	free ( A.realp );
@@ -606,7 +606,7 @@ static void ComplexFFTUsageAndTimingOutOfPlace ( )
 	memcpy ( A.imagp, originalValue.imagp, ( n * sizeof ( float ) ) ); 
 	
 	// Set up the required memory for the FFT routines and check its availability.
-	setup = create_fftsetup ( log2n, FFT_RADIX2 );
+	setup = vDSP_create_fftsetup ( log2n, FFT_RADIX2 );
 	if ( setup == NULL )
 	{      
 		printf ( "\nFFT_Setup failed to allocate enough memory.\n" );
@@ -614,14 +614,14 @@ static void ComplexFFTUsageAndTimingOutOfPlace ( )
 	}
 	
 	// Carry out a Forward and Inverse FFT transform, check for errors.
-	fft_zop ( setup, &A, stride, &result1, result1Stride, log2n, FFT_FORWARD );
-	fft_zop ( setup, &result1, result1Stride, &result1, result1Stride, log2n, FFT_INVERSE );
+	vDSP_fft_zop ( setup, &A, stride, &result1, result1Stride, log2n, FFT_FORWARD );
+	vDSP_fft_zop ( setup, &result1, result1Stride, &result1, result1Stride, log2n, FFT_INVERSE );
 	
 	// Verify correctness of the results.
 	scale = ( float ) 1.0 / n;
 	
-	vsmul( result1.realp, 1, &scale, result1.realp, 1, n );
-	vsmul( result1.imagp, 1, &scale, result1.imagp, 1, n );
+	vDSP_vsmul( result1.realp, 1, &scale, result1.realp, 1, n );
+	vDSP_vsmul( result1.imagp, 1, &scale, result1.imagp, 1, n );
 	
 	Compare( originalValue.realp, result1.realp, n );
 	Compare( originalValue.imagp, result1.imagp, n );
@@ -639,7 +639,7 @@ static void ComplexFFTUsageAndTimingOutOfPlace ( )
 		
 		StartClock ( );
 		for ( i = 0; i < MAX_LOOP_NUM; i++ )
-			fft_zop ( setup, &A, stride, &result1, result1Stride, log2n, FFT_FORWARD );
+			vDSP_fft_zop ( setup, &A, stride, &result1, result1Stride, log2n, FFT_FORWARD );
 		StopClock ( &time );
 		
 #if defined(__VEC__)
@@ -661,7 +661,7 @@ static void ComplexFFTUsageAndTimingOutOfPlace ( )
 	}
 	
 	// Free allocated memory.
-	destroy_fftsetup ( setup );
+	vDSP_destroy_fftsetup ( setup );
 	free ( originalValue.realp );
 	free ( originalValue.imagp );
 	free ( A.realp );
